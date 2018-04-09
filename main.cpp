@@ -4,12 +4,14 @@
 
 #include <iostream>
 #include <unistd.h>
-#include <exception>
+#include <stdexcept>
 #include <string>
 #include <cstring>
 #include <cstdlib>
 
 #include <libusb.h>
+
+#include "usbdevice.h"
 
 //////////////////////////////////////////////////////////////////////
 
@@ -26,19 +28,19 @@ const int cCougarEndpointBulkIn  = 5 | LIBUSB_ENDPOINT_IN;
 // Cougar Helpers
 //////////////////////////////////////////////////////////////////////
 
-void UploadProfile(libusb_device_handle *dev, const std::string& filename)
+void UploadProfile(USBDevice &dev, const std::string& filename)
 {
 
 }
 
-void SetCougarOptions(libusb_device_handle *dev, bool user_profile, bool emu_on)
+void SetCougarOptions(USBDevice &dev, bool user_profile, bool emu_on)
 {
     int err;
     unsigned char data[2];
 
     data[0] = 4;
     data[1] = 2;
-    err = libusb_bulk_transfer(dev, cCougarEndpointBulkOut, data, 2, nullptr, 1000);
+    err = libusb_bulk_transfer(dev.DeviceHandle(), cCougarEndpointBulkOut, data, 2, nullptr, 1000);
     if (err)
         throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(err)));
 
@@ -46,7 +48,7 @@ void SetCougarOptions(libusb_device_handle *dev, bool user_profile, bool emu_on)
     if ( ! emu_on )
     {
         data[0] = 7;
-        err = libusb_bulk_transfer(dev, cCougarEndpointBulkOut, data, 1, nullptr, 1000);
+        err = libusb_bulk_transfer(dev.DeviceHandle(), cCougarEndpointBulkOut, data, 1, nullptr, 1000);
         if (err)
             throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(err)));
     }
@@ -54,57 +56,11 @@ void SetCougarOptions(libusb_device_handle *dev, bool user_profile, bool emu_on)
     data[0] = 3;
     data[1] = ((emu_on ? 1 : 0) << 1) | (user_profile ? 1 : 0);
     std::cout << "Sending emu/profile: " << static_cast<int>(data[1]) << "\n";
-    err = libusb_bulk_transfer(dev, cCougarEndpointBulkOut, data, 2, nullptr, 1000);        
+    err = libusb_bulk_transfer(dev.DeviceHandle(), cCougarEndpointBulkOut, data, 2, nullptr, 1000);        
     if (err)
         throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(err)));        
 }
 
-//////////////////////////////////////////////////////////////////////
-// LibUSB
-//////////////////////////////////////////////////////////////////////
-
-// returns NULL if no valid device found.
-libusb_device_handle* open_device( uint16_t vendorID, uint16_t productID )
-{
-    libusb_device **list;
-    libusb_device *found = nullptr;
-    libusb_device_handle *handle = nullptr;
-
-    try
-    {
-        ssize_t cnt = libusb_get_device_list(nullptr, &list);
-        if (cnt < 0)
-            throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(cnt)));
-
-        ssize_t i = 0;
-        for (i = 0; i < cnt; i++) 
-        {
-            libusb_device *device = list[i];
-            libusb_device_descriptor desc;
-            libusb_get_device_descriptor(device, &desc);
-            if (desc.idVendor == vendorID && desc.idProduct == productID)
-            {
-                found = device;
-                break;
-            }
-        }
-
-        if (found) 
-        {
-            int err = libusb_open(found, &handle);
-            if (err)
-                throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(err)));
-        }
-    }
-    catch(const std::exception &e)
-    {
-        // free and unreferences devices
-        libusb_free_device_list(list, 1);
-        throw;
-    }
-    
-    return handle;
-}
 
 //////////////////////////////////////////////////////////////////////
 // Main/Usage
@@ -128,17 +84,8 @@ int main( int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    int err = libusb_init(nullptr);
-    if (err)
-    {
-        std::cout << "Failed to initialise libusb" << libusb_strerror(static_cast<libusb_error>(err));
-        return EXIT_FAILURE;
-    }
-
-    libusb_device_handle *dev = nullptr;
-
     try
-    {
+    {                
         bool emulation_on = false;
         bool activate_user = false;
         std::string profile_filename;
@@ -172,39 +119,21 @@ int main( int argc, char *argv[])
             }
         }
 
-        dev = open_device(cCougarVID, cCougarPID);
-        if (dev == nullptr)
-            throw std::runtime_error("Cougar device not found.");
-
-        err = libusb_claim_interface(dev, cCougarInterfaceBulkOut);
-        if (err)
-            throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(err)));
+        USBDevice usb_device(cCougarVID, cCougarPID);
+        usb_device.Open();
+        usb_device.ClaimInterface(cCougarInterfaceBulkOut);
 
         // Execute the cmdline options
         if (! profile_filename.empty())
-             UploadProfile(dev, profile_filename);
-        SetCougarOptions(dev, activate_user, emulation_on);
-
-        libusb_release_interface(dev, cCougarInterfaceBulkOut);
+             UploadProfile(usb_device, profile_filename);
+        SetCougarOptions(usb_device, activate_user, emulation_on);
     } 
     catch( const std::exception &e )
     {
         std::cout << "Error: " << e.what() << "\n";
         
-        // TODO: Duplicated cleanup! Wrap libusb resources to avoid manual lifetime handling
-        if (dev != nullptr)
-            libusb_close(dev);
-    
-        libusb_exit(nullptr);
-
         return EXIT_FAILURE;
     }
-
-    // Cleanup
-    if (dev != nullptr)
-        libusb_close(dev);
-
-    libusb_exit(nullptr);
 
     return EXIT_SUCCESS;
 }

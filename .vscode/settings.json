@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "exception": "cpp",
+        "stdexcept": "cpp",
+        "*.tcc": "cpp"
     }
 }
