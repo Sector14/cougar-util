@@ -30,37 +30,18 @@ const int cCougarEndpointBulkIn  = 5 | LIBUSB_ENDPOINT_IN;
 
 void UploadProfile(USBDevice &dev, const std::string& filename)
 {
-
+    // TODO: Implement me
 }
 
 void SetCougarOptions(USBDevice &dev, bool user_profile, bool emu_on)
 {
-    int err;
-    unsigned char data[2];
+    dev.WriteBulkEP({4,2}, cCougarEndpointBulkOut);
+    if (! emu_on)
+        dev.WriteBulkEP({7}, cCougarEndpointBulkOut);
 
-    data[0] = 4;
-    data[1] = 2;
-    err = libusb_bulk_transfer(dev.DeviceHandle(), cCougarEndpointBulkOut, data, 2, nullptr, 1000);
-    if (err)
-        throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(err)));
-
-    // Disabling emulation mode appears to work without 0x7, windows CCP sends this, so we will too.
-    if ( ! emu_on )
-    {
-        data[0] = 7;
-        err = libusb_bulk_transfer(dev.DeviceHandle(), cCougarEndpointBulkOut, data, 1, nullptr, 1000);
-        if (err)
-            throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(err)));
-    }
-
-    data[0] = 3;
-    data[1] = ((emu_on ? 1 : 0) << 1) | (user_profile ? 1 : 0);
-    std::cout << "Sending emu/profile: " << static_cast<int>(data[1]) << "\n";
-    err = libusb_bulk_transfer(dev.DeviceHandle(), cCougarEndpointBulkOut, data, 2, nullptr, 1000);        
-    if (err)
-        throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(err)));        
+    unsigned char options_bm = ((emu_on ? 1 : 0) << 1) | (user_profile ? 1 : 0);
+    dev.WriteBulkEP({3, options_bm}, cCougarEndpointBulkOut);    
 }
-
 
 //////////////////////////////////////////////////////////////////////
 // Main/Usage
@@ -84,12 +65,12 @@ int main( int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    bool emulation_on = false;
+    bool activate_user = false;
+    std::string profile_filename;
+
     try
     {                
-        bool emulation_on = false;
-        bool activate_user = false;
-        std::string profile_filename;
-
         // Disable default error message
         int opt;
 
@@ -111,19 +92,26 @@ int main( int argc, char *argv[])
                     activate_user = strcmp(optarg, "user") == 0;
                     break;
                 case '?':
-                    PrintUsage(argv[0]);
                     throw std::invalid_argument(std::string("Invalid option -") + static_cast<char>(optopt));
                 case ':':
-                    PrintUsage(argv[0]);
                     throw std::invalid_argument(std::string("Option -") + static_cast<char>(optopt) + " missing argument");  
             }
         }
+    }
+    catch( const std::invalid_argument &e )
+    {
+        std::cout << "Error: " << e.what() << "\n\n";
+        PrintUsage(argv[0]);
+        
+        return EXIT_FAILURE;
+    }
 
+    try
+    {
         USBDevice usb_device(cCougarVID, cCougarPID);
         usb_device.Open();
         usb_device.ClaimInterface(cCougarInterfaceBulkOut);
 
-        // Execute the cmdline options
         if (! profile_filename.empty())
              UploadProfile(usb_device, profile_filename);
         SetCougarOptions(usb_device, activate_user, emulation_on);

@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <unordered_set>
+#include <vector>
 
 //////////////////////////////////////////////////////////////////////
 // Forwards
@@ -29,16 +30,14 @@ public:
     void ReleaseInterface(int interfaceNum);
 
     // Ensure interface claimed prior to writing to any endpoints
-    // void WriteBulkEP(std::vector<unsigned char> data, int endpoint);
-
-    libusb_device_handle* DeviceHandle() const { return deviceHandle; }
+    void WriteBulkEP(const std::vector<unsigned char>& data, int endpoint);
 
 private:
     uint16_t vendorID;
     uint16_t productID;
     
     std::unordered_set<int> claimedInterfaces;
-    
+
     libusb_device_handle *deviceHandle = nullptr;
 };
 

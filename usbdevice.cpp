@@ -11,7 +11,6 @@
 
 USBDevice::USBDevice(uint16_t vendorID, uint16_t productID) : vendorID(vendorID), productID(productID)
 {
-    // TODO: Switch to context
     int err = libusb_init(nullptr);
     if (err)
         throw std::runtime_error(std::string("Failed to initialise libusb. ") + libusb_strerror(static_cast<libusb_error>(err)));
@@ -68,7 +67,7 @@ void USBDevice::Open()
     }
     catch(const std::exception &e)
     {
-        // free and unreferences devices
+        // free and unreference devices
         libusb_free_device_list(list, 1);
         throw;
     }
@@ -83,7 +82,6 @@ void USBDevice::Close()
     
     deviceHandle = nullptr;
 }
-
 
 //////////////////////////////////////////////////////////////////////
 
@@ -111,5 +109,16 @@ void USBDevice::ReleaseInterface(int interfaceNum)
 
 //////////////////////////////////////////////////////////////////////
 
-// TODO: Class could sanity check available interfaces / endpoint
-//       pairing and enforce interface claim before endpoint I/O is allowed.
+void USBDevice::WriteBulkEP(const std::vector<unsigned char>& data, int endpoint)
+{
+    // NOTE: No attempt is made to check that correct interface has been claimed for the endpoint to write to.
+    assert( ! claimedInterfaces.empty() && "Cannot write to endpoint without claiming interface first");
+    assert( (endpoint & LIBUSB_ENDPOINT_IN) != LIBUSB_ENDPOINT_IN && "Attempted to read from an IN endpoint");
+
+    int written = 0;
+    int err = libusb_bulk_transfer(deviceHandle, endpoint, const_cast<unsigned char*>(data.data()), data.size(), &written, 1000);
+    if (err)
+        throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(err)));
+    if (written != data.size())
+        throw std::runtime_error("WriteBulkEP only transferred " + std::to_string(written) + " bytes out of " + std::to_string(data.size()) );
+}
