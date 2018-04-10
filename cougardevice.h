@@ -35,28 +35,28 @@ enum class CougarOptions : unsigned char
 // Bitmask Operators
 //////////////////////////////////////////////////////////////////////
 
-constexpr CougarOptions& operator|=(CougarOptions &a, CougarOptions b)
-{
-    a = static_cast<CougarOptions>( static_cast<std::underlying_type<CougarOptions>::type>(a) |
-                                    static_cast<std::underlying_type<CougarOptions>::type>(b));
-    return a;
-}
-
 constexpr CougarOptions operator|(CougarOptions a, CougarOptions b)
 {
-    return a |= b;
-}
-
-constexpr CougarOptions& operator&=(CougarOptions &a, CougarOptions b)
-{
-    a = static_cast<CougarOptions>( static_cast<std::underlying_type<CougarOptions>::type>(a) &
-                                    static_cast<std::underlying_type<CougarOptions>::type>(b));
-    return a;
+    return static_cast<CougarOptions>( static_cast<std::underlying_type<CougarOptions>::type>(a) |
+                                       static_cast<std::underlying_type<CougarOptions>::type>(b));
 }
 
 constexpr CougarOptions operator&(CougarOptions a, CougarOptions b)
 {
-    return a &= b;
+    return static_cast<CougarOptions>( static_cast<std::underlying_type<CougarOptions>::type>(a) &
+                                       static_cast<std::underlying_type<CougarOptions>::type>(b));
+}
+
+constexpr CougarOptions& operator|=(CougarOptions &a, CougarOptions b)
+{
+    a = a | b;
+    return a;
+}
+
+constexpr CougarOptions& operator&=(CougarOptions &a, CougarOptions b)
+{
+    a = a & b;
+    return a;
 }
 
 //////////////////////////////////////////////////////////////////////
