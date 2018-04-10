@@ -33,6 +33,7 @@ void UploadProfile(USBDevice &dev, const std::string& filename)
     // TODO: Implement me
 }
 
+// TODO: Change to enum use for user_profile
 void SetCougarOptions(USBDevice &dev, bool user_profile, bool emu_on)
 {
     dev.WriteBulkEP({4,2}, cCougarEndpointBulkOut);
@@ -49,24 +50,20 @@ void SetCougarOptions(USBDevice &dev, bool user_profile, bool emu_on)
 
 static void PrintUsage(const char* appName)
 {
-    std::cout << "Usage: " << appName << " -e -c [-u]\n";
-    std::cout << "Required:\n";
-    std::cout << "  -e on|off\tSet Button/Axis emulation mode\n";        
-    std::cout << "  -c user|default\tActivate user or default axis profile\n";
-    std::cout << "Optional:\n";
-    std::cout << "  -u FILE\tUpload a tmc user profile\n";
+    std::cout << "Usage: " << appName << " [-u|-e|-m] [-p FILE]\n";
+    std::cout << "Options:\n";
+    std::cout << "  -u \tActivate user axis profile\n";
+    std::cout << "  -e \tEnable Button/Axis emulation mode\n";        
+    std::cout << "  -m \tUse manual calibration data\n"
+    std::cout << "  -p FILE\tUpload a tmc user profile\n";
+    std::cout << "Defaults: default axis profile, no emulation, auto calibration.\n";
 }
 
 int main( int argc, char *argv[])
 {
-    if (argc <= 1)
-    {
-        PrintUsage(argv[0]);
-        return EXIT_FAILURE;
-    }
-
-    bool emulation_on = false;
-    bool activate_user = false;
+    bool manual_calibration = false;
+    bool button_emulation = false;
+    bool user_profile = false;
     std::string profile_filename;
 
     try
@@ -74,22 +71,24 @@ int main( int argc, char *argv[])
         // Disable default error message
         int opt;
 
-        while ((opt = getopt(argc, argv, ":e:u:c:")) != -1)
+        while ((opt = getopt(argc, argv, ":eup:hm")) != -1)
         {
             switch (opt)
             {
-                case 'e':
-                    if (strcmp(optarg, "on") != 0 && strcmp(optarg,"off") != 0) 
-                        throw std::invalid_argument("-e option accepts 'on' or 'off'");
-                    emulation_on = strcmp(optarg, "on") == 0;
+                case 'h':
+                    PrintUsage(argv[0]);
+                    return EXIT_SUCCESS;
+                case 'm':
+                    manual_calibration = true;
                     break;
-                case 'u':
+                case 'e':
+                    button_emulation = true;
+                    break;
+                case 'p':
                     profile_filename = optarg;
                     break;
-                case 'c':
-                    if (strcmp(optarg, "user") != 0 && strcmp(optarg,"default") != 0) 
-                        throw std::invalid_argument("-c option accepts 'user' or 'default'");
-                    activate_user = strcmp(optarg, "user") == 0;
+                case 'u':
+                    user_profile = true;
                     break;
                 case '?':
                     throw std::invalid_argument(std::string("Invalid option -") + static_cast<char>(optopt));
@@ -114,7 +113,9 @@ int main( int argc, char *argv[])
 
         if (! profile_filename.empty())
              UploadProfile(usb_device, profile_filename);
-        SetCougarOptions(usb_device, activate_user, emulation_on);
+        // TODO: Manual calibration enable support
+        // TODO: Switch to options enum mask
+        SetCougarOptions(usb_device, user_profile, button_emulation);
     } 
     catch( const std::exception &e )
     {
