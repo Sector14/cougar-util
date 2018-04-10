@@ -3,6 +3,7 @@
         "*.ipp": "cpp",
         "exception": "cpp",
         "stdexcept": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "type_traits": "cpp"
     }
 }

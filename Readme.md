@@ -24,6 +24,7 @@ or indeed Foxy provides.
 Handles only a single connected Cougar HOTAS. Connections will be made
 to the first detected device in the case of several matching vid:pid devices.
 
+
 # Usage
 
 Run the utility with -h for help.
@@ -42,6 +43,7 @@ and enable your manual calibration data.
 
 cougar-util will need to be run as root in order to access the usb device.
 Refer to the "Automatic Configuation" section to resolve to avoid this.
+
 
 ## Options
 
@@ -88,6 +90,7 @@ NOTE: Uploaded TMC files include manual calibration data. You should only
 use/upload TMC files you have generated yourself via HOTAS CCP if you intend
 to use manual calibration mode.
 
+
 # Other Notes
 
 Access to Windows to perform manual calibration or to compile and upload/switch
@@ -105,6 +108,7 @@ NOTE: As tmc files include manual calibration data, unless you have stolen my
 joystick you should leave the device in auto calibration mode if using the above tmc
 files. In order to use manual calibration mode you should generate your
 own tmc file in Windows.
+
 
 # Usage Examples
 
@@ -132,12 +136,14 @@ emulation off.
 
   ./cougar-util
 
+
 # Building
 
 Requires libusb-1.0 and libusb-1.0-dev.
 
 Run make in the root directory and copy the resulting cougar-util binary
 to somewhere on your path. 
+
 
 # Automatic Configuration
 
@@ -148,6 +154,7 @@ without running the utility manually.
 This can be done via... 
 
 TODO: Udev rules to invoke on connection with -c user -e on as root.
+
 
 # Thoughts on the Future
 
