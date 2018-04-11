@@ -39,11 +39,7 @@ USBDevice::USBDevice(uint16_t vendorID, uint16_t productID) : vendorID(vendorID)
 
 USBDevice::~USBDevice()
 {
-    for (const auto& interfaceNum : claimedInterfaces)
-        libusb_release_interface(deviceHandle, interfaceNum);
-
-    if (deviceHandle != nullptr)
-        libusb_close(deviceHandle);
+    Close();
 
     libusb_exit(nullptr);
 }
@@ -97,6 +93,9 @@ void USBDevice::Open()
 void USBDevice::Close()
 {
     assert(deviceHandle != nullptr && "Close called on already closed device");
+
+    for (const auto& interfaceNum : claimedInterfaces)
+        libusb_release_interface(deviceHandle, interfaceNum);
 
     if (deviceHandle != nullptr)
         libusb_close(deviceHandle);
