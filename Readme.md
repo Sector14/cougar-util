@@ -18,7 +18,7 @@ button/axis emulation.
 
 In a way this utility provides similar functionality to that of the
 HOTAS CCP application that runs during windows startup to configure the
-device. It does not recreate the gui configuration abilities of HOTAS CCP
+device. It does not recreate the full configuration abilities that HOTAS CCP
 or indeed Foxy provides.
 
 If you do not have access to Windows you can still mostly configure your
@@ -92,7 +92,7 @@ the further the pressure range will increase making it difficult to reliably
 hit the same max limit.
 
 You will need to perform a one-time manual calibration via HOTAS CCP in Windows.
-After which using "-m on" will ensure the manual data is used. Note, it's
+After which using "-m" will ensure the manual data is used. Note, it's
 recommended to leave all axis as linear, do not apply curves, Falcon BMS
 will handle this for you.
 
@@ -144,7 +144,7 @@ Activate manual calibration data. Button emulation is disabled and
 default axis mode selected.
 
 ```bash
-  ./cougar-util -m on
+  ./cougar-util -m
 ```
 
 Use a user axis mapping, button emulation and automatic calibration
@@ -268,6 +268,7 @@ and Dunc's replacement for BMS. End users with access to windows (or a VM/wine)
 can also use foxy to edit/generate their own too.
 
 For this reason upload support for compiled TMJ files (BIN) will be added.
+
 
 # HOTASCompiler BIN Files
 
