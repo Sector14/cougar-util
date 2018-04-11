@@ -195,8 +195,8 @@ use a different path for cougar-util, ensure you update the udev rule accordingl
 Anytime you connect your Cougar it should now automatically be placed in user profile 
 mode with manual calibration mode and axis/button emulation enabled.
 
-Modify the 99-HOTAS.rules file to change the mode the Cougar will be placed in
-upon each connection.
+Modify the 99-HOTAS.rules file if you wish to change the mode the Cougar will be 
+placed in upon each connection.
 
 
 # Bundled Configs
@@ -214,7 +214,7 @@ specific to my joystick. You should not enable manual calibration mode with thes
 files. Instead stick to automatic calibration mode or produce your own TCM files
 via windows.
 
-dunc_dx.bin and dunc_dx_replacement.bin are compiled versions of the Dunc TJM/TMM
+dunc_dx.bin and dunc_dx_replacement.bin are compiled versions of the Dunc TMJ/TMM
 files that shipped with Falcon BMS 4.33-U5. Refer to the "HOTASCompiler BIN Files"
 section if you wish to use different TMJ files from Linux.
 
@@ -233,7 +233,7 @@ support in this utility to cover:-
   6. Compile tmj/tmm files
   7. Upload compiled tmj/tmm                               (planned)
   8. Enable/disable Emulation mode                         (supported)
-  9. Select manual or automatic calibration                (planned) 
+  9. Select manual or automatic calibration                (supported) 
 
 Of the unsupported options:-
 
@@ -284,7 +284,7 @@ Advanced, Change permissions,Add, Enter Everyone for the object name, Ok, tick D
 column for "Delete subfolders and files" and then Apply and ok out.
 
 You can now use Foxy to compile any TMJ/TMM file and find the corresponding bin
-file in the virual store. Generate a bin file for each TMJ game profile you wish
+file in the virtual store. Generate a bin file for each TMJ game profile you wish
 to use, transfer to linux and then you can use the cougar-util (once supported) to
 upload and switch between profiles.
 
