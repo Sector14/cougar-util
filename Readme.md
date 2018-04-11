@@ -299,5 +299,3 @@ Please let me know if you encounter any bugs and as always monetary support is
 appreciated. Donations can be made via https://www.paypal.me/GPreston42
 
 Gary Preston <gary@mups.co.uk>
-
-
