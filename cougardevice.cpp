@@ -37,19 +37,12 @@ void UploadProfile(USBDevice &dev, const std::string& filename)
 
     // Upload to Cougar
     dev.WriteBulkEP(data, cCougarEndpointBulkOut);
-    std::cout << "Uploaded TCM profile to Cougar\n";
 
+    // Read profile back
     dev.WriteBulkEP({4,1}, cCougarEndpointBulkOut);
 
-    // If the TMC file has changed the "Apply enable/disable windows axes states" setting
-    // a device reset is required. As a device read (04 01) is not yet used, we'll just assume
-    // profile has changed this and force a device reset.    
-    std::cout << "Restarting device. Please re-run cougar-util to activate profile options\n";
-    dev.WriteBulkEP({9,5}, cCougarEndpointBulkOut);
-
-    // TODO: Wait until device restart detected before returning and setting further config options?
-    // Another option is libusb_reset_device although would need to gracefully handle error condition
-    // and to recreate the device. USBDevice could handle this all internally?
+    // Blocking call, will take several seconds
+    dev.Reconnect();
 }
 
 void SetCougarOptions(USBDevice &dev, CougarOptions options)

@@ -26,6 +26,9 @@ public:
     void Open();
     void Close();
     
+    // Blocking call, may take several seconds to return
+    void Reconnect();
+
     void ClaimInterface(int interfaceNum);
     void ReleaseInterface(int interfaceNum);
 

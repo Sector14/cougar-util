@@ -83,6 +83,24 @@ void USBDevice::Close()
     deviceHandle = nullptr;
 }
 
+void USBDevice::Reconnect()
+{
+    auto err = libusb_reset_device(deviceHandle);
+
+    if (err == 0)
+        return;
+
+    // Device reset may fail causing deviceHandle to be invalidated and requiring re-open
+    if (err = LIBUSB_ERROR_NOT_FOUND)
+    {
+        Close();
+        Open();
+    }
+    else
+        // Unhandled error
+        throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(err)));
+}
+
 //////////////////////////////////////////////////////////////////////
 
 void USBDevice::ClaimInterface(int interfaceNum)
