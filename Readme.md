@@ -153,7 +153,7 @@ emulation off.
 Requires libusb-1.0 and libusb-1.0-dev.
 
 Run make in the root directory and copy the resulting cougar-util binary
-to somewhere on your path. 
+to a suitable location for example /usr/local/bin
 
 
 # Automatic Configuration
@@ -162,12 +162,24 @@ In most cases, upon connection of the Cougar you'll want to automatically
 apply the user profile, manual calibration and emulation mode (or variation of)
 without running the utility manually.
 
-This can be done via... 
+This can be achieved via a custom udev rule such as the one provided in
+config/99-HOTAS.rules. To use, execute the following commands as root. If you
+use a different path for cougar-util, ensure you update the udev rule accordingly.
 
-TODO: Udev rules to invoke on connection with -c user -e on as root.
+```bash
+   cp cougar-util /usr/local/bin
+   cp config/99-HOTAS.rules /etc/udev/rules.d/
+   udevadm trigger
+```
+
+Anytime you connect your Cougar it should now automatically be placed in user profile 
+mode with manual calibration mode and axis/button emulation enabled.
+
+Modify the 99-HOTAS.rules file to change the mode the Cougar will be placed in
+upon each connection.
 
 
-# Bundles Configs
+# Bundled Configs
 
 config/rdr-cursor-on.tmc - Moves the microstick x & y axis to 6/7 and moves
 rudder and toe brakes to 8/9/10. This allows the microstick to be used in Falcon

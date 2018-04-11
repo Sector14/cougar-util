@@ -1,0 +1,1 @@
+SUBSYSTEM=="usb", ATTRS{idVendor}=="044f", ATTRS{idProduct}=="0400",  RUN+="/usr/local/bin/cougar-util -u -m -e"
