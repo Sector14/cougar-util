@@ -156,57 +156,93 @@ This can be done via...
 TODO: Udev rules to invoke on connection with -c user -e on as root.
 
 
+# Bundles Configs
+
+config/rdr-cursor-on.tmc - Moves the microstick x & y axis to 6/7 and moves
+rudder and toe brakes to 8/9/10. This allows the microstick to be used in Falcon
+BMS. It also enables the "Windows Axis" option allowing all 10 axis to be visible.
+
+config/rdr-cursor-off.tmc - Moves microstick x & y axis to 9/10 and rudder/toe
+brakes to 6/7/8. It also disables the "Windows Axis" option, only 7 axis will
+be visible.
+
+Note, if you use either of these tmc files, they contain manual calibration data
+specific to my joystick. You should not enable manual calibration mode with these
+files. Instead stick to automatic calibration mode or produce your own TCM files
+via windows.
+
+dunc_dx.bin and dunc_dx_replacement.bin are compiled versions of the Dunc TJM/TMM
+files that shipped with Falcon BMS 4.33-U5. Refer to the "HOTASCompiler BIN Files"
+section if you wish to use different TMJ files from Linux.
+
+
 # Thoughts on the Future
 
 It would be nice to not need to use Windows at all to do the pre-configuration
 but that cannot happen without further Linux utilities and additional feature
 support in this utility to cover:-
 
-  1. Firmware flashing
+  1. Firmware flashing                                     (planned)
   2. Perform manual calibration
   3. Configure axis mappings and generate tmc file
   4. Upload pre-made tmc                                   (supported) 
   5. Activate user/default tmc profile                     (supported)
   6. Compile tmj/tmm files
-  7. Upload compiled tmj/tmm
+  7. Upload compiled tmj/tmm                               (planned)
   8. Enable/disable Emulation mode                         (supported)
   9. Select manual or automatic calibration                (planned) 
 
 Of the unsupported options:-
 
-"1" - Flashing firmware is feasible to support but without tmj/tmm and manual
-calibration support, would be of limited use.
-
 "2" - I've not reversed the TMC file format yet which will be required
-in order to make any use manual calibration data. Generating this data isn't
-difficult for simple linear based limits. A possible future feature.
+in order to merge new manual calibration data with existing profiles
+and optionally saving back out to a new TMC. Generating this data isn't
+difficult for simple linear based limits. Although there are no current
+plans to support this, it may one day happen.
 
-"3" - As with "2", TMC file format needs reversing. I'm not aware of any existing
-Linux application to configure axis mappings and really a gui app would be of
-limited use as generally the only need to make a custom tmc is to switch
-rudder/toe brake axis mappings out with the RDR Cursor and such a tmc for that is bundled.
+"3" - As with "2", TMC file format needs reversing. I understand the axis
+mapping section, but have not spent time decoding the rest of the tcm file
+yet. 
 
-TMC reversing will however enable embedded manual calibration data to be updated
-once "2" is supported.
+Even if TMC is fully reversed, the usefulness in supporting this is questionable.
+Given that in most cases uploading a pre-made TMC that remaps the RDR Cursor
+would be sufficient for most users with the only real modification being
+merging manual calibration data which is unique to each cougar.
 
-"6" - Compilation of tmj/tmm is not going to be supported and I'm not aware
-of any other application at this time for Linux or Windows that will compile
-the Foxy tmj/tmm files and output a data file suitable for upload. This
-likely involves a non trivial amount of work.
+"6" - Compilation of tmj/tmm is not going to be supported. If you hear about
+a compiler for tmj/tmm files that saves in the same bin format as
+the HOTASCompiler produces (as a temporary file) please let me know.
 
-"7" - Uploading is pointless unless there is a way to easily produce suitable 
-compiled data files at the very least via Windows. Foxy does not provide this.
+Uploading of compiled BIN files on the other hand is worthwhile to allow switching
+between different tmj game profiles without needing Windows/Wine/VM. See
+compiler section below for instructions on generating BIN files in Windows.
 
-A capture of the packet data for a specific tmj/tmm profile could be saved out
-and bundled with this utility or you could save your own mappings out for various
-games. But saving the files is quite user unfriendly and with no ability
-to modify mappings for any bundled files, unlikely to be of great use. That said
-upload support can be added should anyone really want this.
+"7" - This didn't seem possible due to the lack of an output file from the HOTASCompiler.
+However, there is a hacky workaround to get HOTASCompiler.exe in windows to 
+generate a .BIN file that is suitable for uploading to the Cougar. 
 
-If anyone else creates an application that replicates Foxy's compilation process
-and outputs to a data file. I will add support for uploading the result and at this
-time a separate util to allow quick switching between different game tmj/tmm profiles
-would also make sense.
+This makes it possible to bundle a few common compiled profiles such as Dunc's
+and Dunc's replacement for BMS. End users with access to windows (or a VM/wine)
+can also use foxy to edit/generate their own too.
+
+For this reason upload support for compiled TMJ files (BIN) will be added.
+
+# HOTASCompiler BIN Files
+
+The workaround is that on Windows 7, HOTASCompiler.exe generates a BIN file in the
+Program Files(x86)/HOTAS/ directory with the name of the tmj you're compiling and
+the extension .BIN. Due to file access restrictions, the generated temporary file
+is actually created in the Local AppData VirtualStore HOTAS directory.
+
+The snag is that HOTASCompiler deletes this file as soon as it's done. As a workaround
+you can remove the Delete permission on the HOTAS directory. Properties/Security tab/
+Advanced, Change permissions,Add, Enter Everyone for the object name, Ok, tick Deny
+column for "Delete subfolders and files" and then Apply and ok out.
+
+You can now use Foxy to compile any TMJ/TMM file and find the corresponding bin
+file in the virual store. Generate a bin file for each TMJ game profile you wish
+to use, transfer to linux and then you can use the cougar-util (once supported) to
+upload and switch between profiles.
 
 
 # WARNING / DISCLAIMER

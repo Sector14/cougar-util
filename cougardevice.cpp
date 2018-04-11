@@ -52,7 +52,7 @@ void UploadProfile(USBDevice &dev, const std::string& filename)
     if (oldData.at(cProfileDataWindowsAxisIDX) != newData.at(cProfileDataWindowsAxisIDX))   
     {     
         // Blocking call, will take several seconds
-        std::cout << "Windows axis state change requires device reconnection. Reconnecting device...";
+        std::cout << "Windows axis state change requires device reconnection. Reconnecting device...\n";
         dev.Reconnect();
     }
 }
