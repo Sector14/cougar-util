@@ -44,7 +44,9 @@ profile, no emulation, automatic calibration.
 Assuming your Cougar has been one-time configured in Windows, most users
 will simply need to run this utility with the following switches:
 
+```bash
   ./cougar-util -u -e -m
+```
 
 Which will activate the existing user profile mapping, enable button and axis 
 emulation and enable your manual calibration data.
@@ -55,7 +57,9 @@ Refer to the "Automatic Configuration" section for alternatives.
 
 ## Options
 
+```
   -u    Selects "user" axis profile, otherwise the "default" profile is used.
+```
 
 Using a user profile is required if you've made changes to the axes curves or
 swapped the RDR Cursor and toe break axis. The image below shows such a setup
@@ -63,7 +67,9 @@ in HOTAS CCP.
 
 ![RDR Cursor axis configuration](images/axis-config.png)
 
+```
   -e    Turns button emulation on, otherwise button emulation is off.
+```
 
 Button emulation is only required if you're making use of a tmj/tmm file
 which outputs key presses or axis values. When off, only regular DX button
@@ -71,7 +77,9 @@ presses will be generated. For example, you should enable button emulation
 if you've loaded the dunc_replacement tmj/tmm file via Foxy which turns the
 paddle switch into a dual function, autopilot override + wheel brake application.
 
+```
   -m    Enables manual calibration mode, otherwise automatic calibration is used.
+```
 
 In automatic calibration mode, the Cougar will determine axis limits through
 general usage of the device. Moving every axis through its full range of
@@ -88,7 +96,9 @@ After which using "-m on" will ensure the manual data is used. Note, it's
 recommended to leave all axis as linear, do not apply curves, Falcon BMS
 will handle this for you.
 
+```
   -p    Allows a specified tmc axis profile to be uploaded to the Cougar's flash.
+```
 
 After configuring axes in HOTAS CCP and making curve/deadzone adjustments
 plus performing a manually calibration, any TMC file you then save can be uploaded
@@ -126,27 +136,36 @@ own tmc file in Windows.
 Activate user axis profile (for RDR Cursor), button emulation mode for
 use by currently uploaded tmj/tmm profile and manual calibration data.
 
+```bash
   ./cougar-util -u -e -m
+```
 
 Activate manual calibration data. Button emulation is disabled and 
 default axis mode selected.
 
+```bash
   ./cougar-util -m on
+```
 
 Use a user axis mapping, button emulation and automatic calibration
 
+```bash
   ./cougar-util -u -m
+```
 
 Upload and activate a custom user axis profile. Button emulation will be off
 and calibration mode will be automatic.
 
+```bash
   ./cougar-util -p config/rdr-cursor-on.tmc
+```
 
 Switch back to all default, automatic calibration, default axis, button 
 emulation off.
 
+```bash
   ./cougar-util
-
+```
 
 # Building
 
