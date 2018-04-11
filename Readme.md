@@ -62,7 +62,7 @@ Refer to the "Automatic Configuration" section for alternatives.
 ```
 
 Using a user profile is required if you've made changes to the axes curves or
-swapped the RDR Cursor and toe break axis. The image below shows such a setup
+swapped the RDR Cursor and toe brake axis. The image below shows such a setup
 in HOTAS CCP.
 
 ![RDR Cursor axis configuration](images/axis-config.png)
@@ -281,11 +281,11 @@ is actually created in the Local AppData VirtualStore HOTAS directory.
 The snag is that HOTASCompiler deletes this file as soon as it's done. As a workaround
 you can remove the Delete permission on the HOTAS directory. Properties/Security tab/
 Advanced, Change permissions,Add, Enter Everyone for the object name, Ok, tick Deny
-column for "Delete subfolders and files" and then Apply and ok out.
+column for "Delete sub-folders and files" and then Apply and ok out.
 
 You can now use Foxy to compile any TMJ/TMM file and find the corresponding bin
 file in the virtual store. Generate a bin file for each TMJ game profile you wish
-to use, transfer to linux and then you can use the cougar-util (once supported) to
+to use, transfer to Linux and then you can use the cougar-util (once supported) to
 upload and switch between profiles.
 
 
