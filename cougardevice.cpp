@@ -50,10 +50,12 @@ void UploadProfile(USBDevice &dev, const std::string& filename)
 
     // Has "Window axis" flag changed in new profile? Device reconnect required to take apply.
     if (oldData.at(cProfileDataWindowsAxisIDX) != newData.at(cProfileDataWindowsAxisIDX))   
-    {     
-        // Blocking call, will take several seconds
-        std::cout << "Windows axis state change requires device reconnection. Reconnecting device...\n";
-        dev.Reconnect();
+    {   
+        // Reset device  
+        dev.WriteBulkEP({9,5}, cCougarEndpointBulkOut);
+
+        // Blocking call, may take several seconds
+        dev.Reconnect();                
     }
 }
 
