@@ -32,9 +32,10 @@ public:
     void ClaimInterface(int interfaceNum);
     void ReleaseInterface(int interfaceNum);
 
-    // Ensure interface claimed prior to writing to any endpoints
+    // Ensure interface claimed prior to any endpoint I/O
     void WriteBulkEP(const std::vector<unsigned char>& data, int endpoint);
-
+    std::vector<unsigned char> ReadBulkEP(size_t readSize, int endpoint);
+    
 private:
     uint16_t vendorID;
     uint16_t productID;

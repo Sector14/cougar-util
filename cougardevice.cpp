@@ -2,12 +2,17 @@
 #include <iostream>
 #include <type_traits>
 
+#include <chrono>
+#include <thread>
+
 #include "cougardevice.h"
 #include "usbdevice.h"
 
 namespace CougarDevice {
 
 static const size_t cTMCFileSizeBytes = 171;
+
+static const int cProfileDataWindowsAxisIDX = 168;
 
 //////////////////////////////////////////////////////////////////////
 // Cougar Helpers
@@ -29,20 +34,27 @@ void UploadProfile(USBDevice &dev, const std::string& filename)
         throw std::runtime_error("TCM profiles expected to be 171 bytes. User file is " + std::to_string(endPos - beginPos) + " bytes.");
 
     // Read in the entire file
-    std::vector<unsigned char> data;
-    data.resize(cTMCFileSizeBytes);
+    std::vector<unsigned char> newData;
+    newData.resize(cTMCFileSizeBytes);
 
     file.seekg(0, std::ios::beg);
-    file.read(reinterpret_cast<char *>(data.data()), data.size());
+    file.read(reinterpret_cast<char *>(newData.data()), newData.size());
 
-    // Upload to Cougar
-    dev.WriteBulkEP(data, cCougarEndpointBulkOut);
-
-    // Read profile back
+    // Read current profile data to determine if the "Windows Axis" state has changed
+    bool window_axis_changed = false;
     dev.WriteBulkEP({4,1}, cCougarEndpointBulkOut);
+    auto oldData = dev.ReadBulkEP(256, cCougarEndpointBulkIn);
+    
+    // Upload to Cougar
+    dev.WriteBulkEP(newData, cCougarEndpointBulkOut);
 
-    // Blocking call, will take several seconds
-    dev.Reconnect();
+    // Has "Window axis" flag changed in new profile? Device reconnect required to take apply.
+    if (oldData.at(cProfileDataWindowsAxisIDX) != newData.at(cProfileDataWindowsAxisIDX))   
+    {     
+        // Blocking call, will take several seconds
+        std::cout << "Windows axis state change requires device reconnection. Reconnecting device...";
+        dev.Reconnect();
+    }
 }
 
 void SetCougarOptions(USBDevice &dev, CougarOptions options)

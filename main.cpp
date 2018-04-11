@@ -80,6 +80,7 @@ int main( int argc, char *argv[])
         USBDevice usb_device(CougarDevice::cCougarVID, CougarDevice::cCougarPID);
         usb_device.Open();
         usb_device.ClaimInterface(CougarDevice::cCougarInterfaceBulkOut);
+        usb_device.ClaimInterface(CougarDevice::cCougarInterfaceBulkIn);
 
         if (! profile_filename.empty())
              CougarDevice::UploadProfile(usb_device, profile_filename);

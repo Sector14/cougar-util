@@ -17,7 +17,7 @@ const int cCougarInterfaceBulkOut = 3;
 const int cCougarInterfaceBulkIn  = 4;
 
 const int cCougarEndpointBulkOut = 4;
-const int cCougarEndpointBulkIn  = 5;
+const int cCougarEndpointBulkIn  = 5 | 0x80;
 
 //////////////////////////////////////////////////////////////////////
 // Cougar Options bitflags

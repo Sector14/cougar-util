@@ -131,7 +131,7 @@ void USBDevice::WriteBulkEP(const std::vector<unsigned char>& data, int endpoint
 {
     // NOTE: No attempt is made to check that correct interface has been claimed for the endpoint to write to.
     assert( ! claimedInterfaces.empty() && "Cannot write to endpoint without claiming interface first");
-    assert( (endpoint & LIBUSB_ENDPOINT_IN) != LIBUSB_ENDPOINT_IN && "Attempted to read from an IN endpoint");
+    assert( (endpoint & LIBUSB_ENDPOINT_IN) != LIBUSB_ENDPOINT_IN && "WriteBulkEP requires OUT endpoint for writing");
 
     int written = 0;
     int err = libusb_bulk_transfer(deviceHandle, endpoint, const_cast<unsigned char*>(data.data()), data.size(), &written, 1000);
@@ -139,4 +139,23 @@ void USBDevice::WriteBulkEP(const std::vector<unsigned char>& data, int endpoint
         throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(err)));
     if (written != data.size())
         throw std::runtime_error("WriteBulkEP only transferred " + std::to_string(written) + " bytes out of " + std::to_string(data.size()) );
+}
+
+std::vector<unsigned char> USBDevice::ReadBulkEP(size_t readSize, int endpoint)
+{
+    // NOTE: No attempt is made to check that correct interface has been claimed for the endpoint to write to.
+    assert( ! claimedInterfaces.empty() && "Cannot write to endpoint without claiming interface first");
+    assert( (endpoint & LIBUSB_ENDPOINT_IN) == LIBUSB_ENDPOINT_IN && "ReadBulkEP requires IN endpoint for reading");
+
+    std::vector<unsigned char> data;
+    data.resize(readSize);
+
+    int read_count = 0;
+    int err = libusb_bulk_transfer(deviceHandle, endpoint, const_cast<unsigned char*>(data.data()), data.size(), &read_count, 1000);
+    if (err)
+        throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(err)));
+
+    data.resize(read_count);
+
+    return data;
 }

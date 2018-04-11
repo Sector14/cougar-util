@@ -4,6 +4,9 @@
         "exception": "cpp",
         "stdexcept": "cpp",
         "*.tcc": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "*.h": "cpp",
+        "array": "cpp",
+        "thread": "cpp"
     }
 }
