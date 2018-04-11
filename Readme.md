@@ -11,7 +11,7 @@ axis, no button emulation, automatic calibration mode, however user
 profile, tmj/tmm and manual calibration data from prior configuration
 (in Windows) is retained in the Cougar's flash. 
 
-This utility allows setting three configuration options within the Cougar
+This utility allows setting the three configuration options within the Cougar
 to make use of the pre-configured data. Selection of default or user axis
 profile, using manual or automatic calibration data and enabling/disabling
 button/axis emulation.
@@ -21,28 +21,36 @@ HOTAS CCP application that runs during windows startup to configure the
 device. It does not recreate the gui configuration abilities of HOTAS CCP
 or indeed Foxy provides.
 
+If you do not have access to Windows you can still mostly configure your
+HOTAS. A bundled tcm profile allows the RDR Cursor axis to be remapped
+for use in Falcon BMS, however due to embedded manual calibration data
+you will need to stick to using automatic calibration mode when using the
+bundled TCM.
+
 Handles only a single connected Cougar HOTAS. Connections will be made
 to the first detected device in the case of several matching vid:pid devices.
 
+Further support to reduce the reliance on access to a Windows machine is
+covered in the "Thoughts on the Future" section.
 
 # Usage
 
 Run the utility with -h for help.
 
 Running ./cougar-util with no options will configure the Cougar to the same
-state it would be in if you reconnect the device. Default axis profile, no
-emulation, automatic calibration.
+state it would be in if you disconnect and reconnect the device. Default axis
+profile, no emulation, automatic calibration.
 
 Assuming your Cougar has been one-time configured in Windows, most users
 will simply need to run this utility with the following switches:
 
   ./cougar-util -u -e -m
 
-Which will activate the user profile mapping, enable button and axis emulation
-and enable your manual calibration data.
+Which will activate the existing user profile mapping, enable button and axis 
+emulation and enable your manual calibration data.
 
-cougar-util will need to be run as root in order to access the usb device.
-Refer to the "Automatic Configuation" section to resolve to avoid this.
+NOTE: cougar-util will need to be run as root in order to access the usb device.
+Refer to the "Automatic Configuration" section for alternatives.
 
 
 ## Options
@@ -86,9 +94,12 @@ After configuring axes in HOTAS CCP and making curve/deadzone adjustments
 plus performing a manually calibration, any TMC file you then save can be uploaded
 from Linux using the above option.
 
+You should also ensure the option "Apply enable/disable windows axes states"
+is ticked prior to saving the TMC file.
+
 NOTE: Uploaded TMC files include manual calibration data. You should only
 use/upload TMC files you have generated yourself via HOTAS CCP if you intend
-to use manual calibration mode.
+to plan to enable manual calibration mode.
 
 
 # Other Notes
