@@ -109,7 +109,7 @@ is ticked prior to saving the TMC file.
 
 NOTE: Uploaded TMC files include manual calibration data. You should only
 use/upload TMC files you have generated yourself via HOTAS CCP if you intend
-to plan to enable manual calibration mode.
+to enable manual calibration mode.
 
 
 # Other Notes
@@ -123,7 +123,7 @@ and have no access to Windows can upload the bundled config\falcon-rdr-cursor-on
 
 This enables support for the RDR Cursor axis at the expense of the rudder toe brake
 axes (see Falcon BMS Cougar setup docs for more information). Upload only needs to
-be performed once. After that use the "-p user" option above.
+be performed once. After that use the "-p" option above.
 
 NOTE: As tmc files include manual calibration data, unless you have stolen my
 joystick you should leave the device in auto calibration mode if using the above tmc
@@ -140,28 +140,29 @@ use by currently uploaded tmj/tmm profile and manual calibration data.
   ./cougar-util -u -e -m
 ```
 
-Activate manual calibration data. Button emulation is disabled and 
+Use manual calibration data. Button emulation is disabled and 
 default axis mode selected.
 
 ```bash
   ./cougar-util -m
 ```
 
-Use a user axis mapping, button emulation and automatic calibration
+Select user axis profile, enable button emulation and use automatic calibration
 
 ```bash
-  ./cougar-util -u -m
+  ./cougar-util -u -e
 ```
 
-Upload and activate a custom user axis profile. Button emulation will be off
+Upload and select a custom user axis profile. Button emulation will be off
 and calibration mode will be automatic.
 
 ```bash
   ./cougar-util -p config/rdr-cursor-on.tmc
 ```
 
-Switch back to all default, automatic calibration, default axis, button 
-emulation off.
+Switch back to defaults, automatic calibration, default axis, button 
+emulation off. Previously uploaded profile and manual calibration data is
+retained and available for later activation.
 
 ```bash
   ./cougar-util
