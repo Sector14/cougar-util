@@ -39,7 +39,8 @@ USBDevice::USBDevice(uint16_t vendorID, uint16_t productID) : vendorID(vendorID)
 
 USBDevice::~USBDevice()
 {
-    Close();
+    if (deviceHandle != nullptr)
+        Close();
 
     libusb_exit(nullptr);
 }

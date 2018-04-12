@@ -19,13 +19,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
-#include <unistd.h>
-#include <stdexcept>
-#include <string>
+#include <cstdio>
 #include <cstring>
 #include <cstdlib>
+#include <iostream>
+#include <stdexcept>
+#include <string>
 #include <type_traits>
+#include <unistd.h>
 
 #include "usbdevice.h"
 #include "cougardevice.h"
@@ -42,22 +43,26 @@ static void PrintUsage(const char* appName)
     std::cout << "Options:\n";
     std::cout << "  -u \tActivate user axis profile\n";
     std::cout << "  -e \tEnable Button/Axis emulation mode\n";        
-    std::cout << "  -m \tUse manual calibration data (implies -u)\n";
+    std::cout << "  -m \tUse manual calibration data (implies -u)\n\n";
     std::cout << "  -p FILE\tUpload a tmc user profile (implies -u)\n";
+    std::cout << "  -t FILE\tUpload a compiled tjm binary\n";
+    std::cout << "  -f FILE\tUpload new firmware to Cougar\n";
     std::cout << "Defaults: default axis profile, no emulation, auto calibration.\n";
 }
 
 int main( int argc, char *argv[])
 {
     std::string profile_filename;
+    std::string tjmbin_filename;
+    std::string firmware_filename;
     CougarOptions cougar_options = CougarOptions::Defaults;
 
     try
     {                
-        // Disable default error message
         int opt;
 
-        while ((opt = getopt(argc, argv, ":eup:hm")) != -1)
+        // Args with default error message disabled
+        while ((opt = getopt(argc, argv, ":euf:p:t:hm")) != -1)
         {
             switch (opt)
             {
@@ -70,9 +75,15 @@ int main( int argc, char *argv[])
                 case 'e':
                     cougar_options = cougar_options | CougarOptions::ButtonAxisEmulation;
                     break;
+                case 'f':
+                    firmware_filename = optarg;
+                    break;
                 case 'p':
                     profile_filename = optarg;
-                    cougar_options = cougar_options | CougarOptions::UserProfile;                    
+                    cougar_options = cougar_options | CougarOptions::UserProfile;
+                    break;
+                case 't':
+                    tjmbin_filename = optarg;
                     break;
                 case 'u':
                     cougar_options = cougar_options | CougarOptions::UserProfile;
@@ -94,14 +105,40 @@ int main( int argc, char *argv[])
 
     try
     {
+        if (! firmware_filename.empty())
+        {
+            std::cout << "********************************************************************************\n"
+                         "*    WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING   *\n"
+                         "********************************************************************************\n\n"
+                         "Thrustmaster recommend you DISCONNECT your THROTTLE from the Cougar before "
+                         "uploading new firmware. Users have reported permanent damage to the throttle "
+                         "if left connected. Firmware update is at your own risk.\n\n";
+            std::cout << "Before proceeding, unplug your Cougar (and disconnect your throttle) then hold "
+                         "down the trigger and plug your Cougar back in. Keep the trigger held down for "
+                         "at least four second to wipe any existing firmware. Then release the trigger"
+                         "and wait a few more seconds for Linux to re-detect the device.\n\n";
+            std::cout << "Proceed with firmware upload? (y/n): ";
+            if (getchar() != 'y')
+            {
+                std::cout << "Aborting\n";
+                return EXIT_FAILURE;
+            }
+        }
+
         USBDevice usb_device(CougarDevice::cCougarVID, CougarDevice::cCougarPID);
         usb_device.Open();
         usb_device.ClaimInterface(CougarDevice::cCougarInterfaceBulkOut);
         usb_device.ClaimInterface(CougarDevice::cCougarInterfaceBulkIn);
 
-        if (! profile_filename.empty())
-             CougarDevice::UploadProfile(usb_device, profile_filename);
+        if (! firmware_filename.empty())
+            CougarDevice::UploadFirmware(usb_device, firmware_filename);
         
+        if (! profile_filename.empty())
+            CougarDevice::UploadProfile(usb_device, profile_filename);
+
+        if (! tjmbin_filename.empty())
+            CougarDevice::UploadTMJBinary(usb_device, tjmbin_filename);
+
         CougarDevice::SetCougarOptions(usb_device, cougar_options);
     } 
     catch( const std::exception &e )

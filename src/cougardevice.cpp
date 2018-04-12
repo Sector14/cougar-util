@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <type_traits>
@@ -30,39 +31,59 @@ namespace CougarDevice {
 
 static const size_t cTMCFileSizeBytes = 171;
 
+// Profile data returned by 04 01
 static const int cProfileDataWindowsAxisIDX = 168;
+
+//////////////////////////////////////////////////////////////////////
+// File I/O
+//////////////////////////////////////////////////////////////////////
+
+// Pass requiredSize > 0 to throw if file is not of expected size
+std::vector<unsigned char> LoadBinaryFile(const std::string& filename, size_t requiredSize = 0)
+{
+    std::ifstream file(filename, std::ios::binary);
+    if (! file.is_open())
+        throw std::runtime_error("Unable to open file " + filename);
+
+    // Sanity check user selected suitable file based on expected size
+    auto begin_pos = file.tellg();
+    file.seekg(0, std::ios::end);
+    auto end_pos = file.tellg();
+    
+    size_t file_size = end_pos - begin_pos;
+
+    if (requiredSize != 0 && file_size != requiredSize)
+        throw std::runtime_error("Loaded file is " + std::to_string(file_size) + " bytes." +
+                                 "Required " + std::to_string(requiredSize) + " bytes.");
+
+    // Read in the entire file
+    std::vector<unsigned char> newData;
+    newData.resize(file_size);
+
+    file.seekg(0, std::ios::beg);
+    file.read(reinterpret_cast<char *>(newData.data()), newData.size());
+
+    return newData;
+}
 
 //////////////////////////////////////////////////////////////////////
 // Cougar Helpers
 //////////////////////////////////////////////////////////////////////
 
+void UploadFirmware(USBDevice &dev, const std::string& filename)
+{
+    std::cout << "Not implemented yet\n";
+}
+
+// Pre-compiled TMJ/TMM file
 void UploadProfile(USBDevice &dev, const std::string& filename)
 {
-    std::ifstream file(filename, std::ios::binary);
-    if (! file.is_open())
-        throw std::runtime_error("Unable to open profile file " + filename);
-
-    // TODO: Once TCM format reversed, validate file before uploading.
-    // TCM profiles are 171 bytes, sanity check specified user file
-    auto beginPos = file.tellg();
-    file.seekg(0, std::ios::end);
-    auto endPos = file.tellg();
-
-    if (endPos - beginPos != cTMCFileSizeBytes)
-        throw std::runtime_error("TCM profiles expected to be 171 bytes. User file is " + std::to_string(endPos - beginPos) + " bytes.");
-
-    // Read in the entire file
-    std::vector<unsigned char> newData;
-    newData.resize(cTMCFileSizeBytes);
-
-    file.seekg(0, std::ios::beg);
-    file.read(reinterpret_cast<char *>(newData.data()), newData.size());
-
-    // Read current profile data to determine if the "Windows Axis" state has changed
-    bool window_axis_changed = false;
+    // Read current profile data to determine current options setting
     dev.WriteBulkEP({4,1}, cCougarEndpointBulkOut);
     auto oldData = dev.ReadBulkEP(256, cCougarEndpointBulkIn);
     
+    auto newData = LoadBinaryFile(filename, cTMCFileSizeBytes);
+
     // Upload to Cougar
     dev.WriteBulkEP(newData, cCougarEndpointBulkOut);
 
@@ -75,6 +96,11 @@ void UploadProfile(USBDevice &dev, const std::string& filename)
         // Blocking call, may take several seconds
         dev.Reconnect();                
     }
+}
+
+void UploadTMJBinary(USBDevice &dev, const std::string& filename)
+{
+    std::cout << "Not implemented yet\n";
 }
 
 void SetCougarOptions(USBDevice &dev, CougarOptions options)
