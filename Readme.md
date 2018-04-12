@@ -111,6 +111,21 @@ NOTE: Uploaded TMC files include manual calibration data. You should only
 use/upload TMC files you have generated yourself via HOTAS CCP if you intend
 to enable manual calibration mode.
 
+```
+  -f    Upload the specified firmware file to the Cougar
+```
+
+Due to the copyright restrictions it is unclear whether distribution of the Cougar
+firmware is allowed. This utility can extract the firmware out of the HOTASUpdate.exe
+that is a part of the Cougar Windows driver installation. Please obtain a copy
+of HOTASUpdate.exe and specify its location after the "-f" option.
+
+The correct HOTASUpdate.exe should match this sha256sum
+
+```
+d91314c4326eb49f2298d5bbf024fac8d8c694e057ab769dc1fda931cb7f3db5  config/HOTASUpdate.exe
+```
+
 
 # Other Notes
 

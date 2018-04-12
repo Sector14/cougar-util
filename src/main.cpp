@@ -113,9 +113,9 @@ int main( int argc, char *argv[])
                          "Thrustmaster recommend you DISCONNECT your THROTTLE from the Cougar before "
                          "uploading new firmware. Users have reported permanent damage to the throttle "
                          "if left connected. Firmware update is at your own risk.\n\n";
-            std::cout << "Before proceeding, unplug your Cougar (and disconnect your throttle) then hold "
-                         "down the trigger and plug your Cougar back in. Keep the trigger held down for "
-                         "at least four second to wipe any existing firmware. Then release the trigger"
+            std::cout << "Before proceeding, unplug your Cougar (and disconnect your throttle) then whilst holding "
+                         "down the trigger, plug your Cougar back in. Keep the trigger held down for "
+                         "at least four seconds after connection to wipe any existing firmware. Then release the trigger "
                          "and wait a few more seconds for Linux to re-detect the device.\n\n";
             std::cout << "Proceed with firmware upload? (y/n): ";
             if (getchar() != 'y')
@@ -131,7 +131,17 @@ int main( int argc, char *argv[])
         usb_device.ClaimInterface(CougarDevice::cCougarInterfaceBulkIn);
 
         if (! firmware_filename.empty())
+        {
+            std::cout << "Uploading firmware. This may take several seconds to complete.\n";
             CougarDevice::UploadFirmware(usb_device, firmware_filename);
+
+            std::cout << "\nFirmware upload complete. "
+                         "Please disconnect your Cougar, re-attach the throttle and reconnect. Wait a few seconds "
+                         "for device detection then move each axis through its full range of motion, "
+                         "holding at each limit for 3 seconds to allow auto calibration to work.\n\n"
+                         "It is recommended you now upload a tcm profile and optionally a compiled tjm binary.\n";
+            return EXIT_SUCCESS;
+        }
         
         if (! profile_filename.empty())
             CougarDevice::UploadProfile(usb_device, profile_filename);
