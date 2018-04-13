@@ -48,15 +48,14 @@ static const std::vector<unsigned char> cDefaultTCMProfile = {
 // Pass requiredSize > 0 to throw if file is not of expected size
 std::vector<unsigned char> LoadBinaryFile(const std::string& filename, size_t requiredSize = 0)
 {
-    // TODO: use ate instead
-    std::ifstream file(filename, std::ios::binary);
+    std::ifstream file(filename, std::ios::binary | std::ios::ate);
     if (! file.is_open())
         throw std::runtime_error("Unable to open file " + filename);
 
     // Sanity check user selected suitable file based on expected size
-    auto begin_pos = file.tellg();
-    file.seekg(0, file.end);
     auto end_pos = file.tellg();
+    file.seekg(0, file.beg);
+    auto begin_pos = file.tellg();
     
     size_t file_size = end_pos - begin_pos;
 
@@ -71,7 +70,9 @@ std::vector<unsigned char> LoadBinaryFile(const std::string& filename, size_t re
     file.seekg(0, std::ios::beg);
     file.read(reinterpret_cast<char *>(newData.data()), newData.size());
 
-    // TODO: Check if file "bad" or throw    
+    if (! file.good())
+        throw std::runtime_error("Unable to read file data from " + filename);
+
     return newData;
 }
 
@@ -102,7 +103,6 @@ void UploadProfileData(USBDevice &dev, const std::vector<unsigned char> &data)
         WaitResetDevice(dev);
 }
 
-// Pre-compiled TMJ/TMM file
 void UploadProfile(USBDevice &dev, const std::string& filename)
 {   
     auto new_data = LoadBinaryFile(filename, cTMCFileSizeBytes);
@@ -133,7 +133,6 @@ void UploadFirmware(USBDevice &dev, const std::string& filename)
 {
     // TODO: Verify sha256sum of HOTASUpdate.exe
 
-    // TODO: Extract firmware using hardcoded offset
     std::ifstream file(filename, std::ios::binary);
     if (! file.is_open())
         throw std::runtime_error("Unable to open file " + filename);
