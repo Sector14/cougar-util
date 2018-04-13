@@ -1,1 +1,3 @@
-SUBSYSTEM=="usb", ATTRS{idVendor}=="044f", ATTRS{idProduct}=="0400",  RUN+="/usr/local/bin/cougar-util -u -m -e"
+# Auto configure the Cougar upon connection UNLESS cougar-util is detected as already running.
+# This may occur during user profile uploads and firmware flashing.
+SUBSYSTEM=="usb", ATTRS{idVendor}=="044f", ATTRS{idProduct}=="0400",  RUN+="if [ "`pgrep cougar-util`" == "" ]; then `/usr/local/bin/cougar-util -u -m -e` fi"

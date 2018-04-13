@@ -39,6 +39,9 @@ const int cCougarInterfaceBulkIn  = 4;
 const int cCougarEndpointBulkOut = 4;
 const int cCougarEndpointBulkIn  = 5 | 0x80;
 
+// Util only supports extracting and updating a single fw version at this time.
+const std::string cSupportedFirmwareVersion{ "3.00.6 revB" };
+
 //////////////////////////////////////////////////////////////////////
 // Cougar Options bitflags
 //////////////////////////////////////////////////////////////////////
@@ -83,7 +86,9 @@ constexpr CougarOptions& operator&=(CougarOptions &a, CougarOptions b)
 // Cougar Helpers
 //////////////////////////////////////////////////////////////////////
 
+void UploadFirmware(USBDevice &usb_device, const std::string& firmware_filename);
 void UploadProfile(USBDevice &dev, const std::string& filename);
+void UploadTMJBinary(USBDevice &dev, const std::string& filename);
 void SetCougarOptions(USBDevice &dev, CougarOptions options);
 
 //////////////////////////////////////////////////////////////////////

@@ -39,7 +39,8 @@ USBDevice::USBDevice(uint16_t vendorID, uint16_t productID) : vendorID(vendorID)
 
 USBDevice::~USBDevice()
 {
-    Close();
+    if (deviceHandle != nullptr)
+        Close();
 
     libusb_exit(nullptr);
 }
@@ -154,7 +155,7 @@ void USBDevice::WriteBulkEP(const std::vector<unsigned char>& data, int endpoint
     assert( (endpoint & LIBUSB_ENDPOINT_IN) != LIBUSB_ENDPOINT_IN && "WriteBulkEP requires OUT endpoint for writing");
 
     int written = 0;
-    int err = libusb_bulk_transfer(deviceHandle, endpoint, const_cast<unsigned char*>(data.data()), data.size(), &written, 1000);
+    int err = libusb_bulk_transfer(deviceHandle, endpoint, const_cast<unsigned char*>(data.data()), data.size(), &written, 0);
     if (err)
         throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(err)));
     if (written != data.size())
@@ -171,7 +172,7 @@ std::vector<unsigned char> USBDevice::ReadBulkEP(size_t readSize, int endpoint)
     data.resize(readSize);
 
     int read_count = 0;
-    int err = libusb_bulk_transfer(deviceHandle, endpoint, const_cast<unsigned char*>(data.data()), data.size(), &read_count, 1000);
+    int err = libusb_bulk_transfer(deviceHandle, endpoint, const_cast<unsigned char*>(data.data()), data.size(), &read_count, 0);
     if (err)
         throw std::runtime_error(libusb_strerror(static_cast<libusb_error>(err)));
 
