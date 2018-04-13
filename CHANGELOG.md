@@ -9,7 +9,10 @@ found in the [project git repository](https://bitbucket.org/BWGaryP/cougar-util)
 
 This project uses [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [Unrelease]
+   - ...
+   
+## [0.2.0] - 2018-04-13
 ### Added
    - Add "-f" option to extract firmware from HOTASUpdate.exe and flash Cougar.   
    - Add "-t" option to upload pre-compiled TMJ binaries.

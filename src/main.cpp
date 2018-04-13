@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using CougarOptions = CougarDevice::CougarOptions;
 
-const std::string cAppVersion = "0.1.0";
+const std::string cAppVersion = "0.2.0";
 
 //////////////////////////////////////////////////////////////////////
 // Main/Usage

@@ -1,4 +1,4 @@
-# Cougar Util - Version 0.1
+# Cougar Util - Version 0.2
 
 Provides support for configuring a Cougar HOTAS in Linux.
 
