@@ -83,7 +83,9 @@ constexpr CougarOptions& operator&=(CougarOptions &a, CougarOptions b)
 // Cougar Helpers
 //////////////////////////////////////////////////////////////////////
 
+void UploadFirmware(USBDevice &usb_device, const std::string& firmware_filename);
 void UploadProfile(USBDevice &dev, const std::string& filename);
+void UploadTMJBinary(USBDevice &dev, const std::string& filename);
 void SetCougarOptions(USBDevice &dev, CougarOptions options);
 
 //////////////////////////////////////////////////////////////////////

@@ -111,6 +111,31 @@ NOTE: Uploaded TMC files include manual calibration data. You should only
 use/upload TMC files you have generated yourself via HOTAS CCP if you intend
 to enable manual calibration mode.
 
+```
+  -f    Upload the specified firmware file to the Cougar
+```
+
+Due to the copyright restrictions it is unclear whether distribution of the Cougar
+firmware is allowed. This utility can extract the firmware out of the HOTASUpdate.exe
+that is a part of the Cougar Windows driver installation. Please obtain a copy
+of HOTASUpdate.exe and specify its location e.g "-f config/HOTASUpdate.exe" option.
+
+The correct HOTASUpdate.exe should match this sha256sum
+
+```
+d91314c4326eb49f2298d5bbf024fac8d8c694e057ab769dc1fda931cb7f3db5  config/HOTASUpdate.exe
+```
+
+Once the firmware flashing process completes, you should disconnect the Cougar, re-attach
+the throttle and connect again. After allowing a few seconds for Linux to detect the
+joystick, move every axis through their full range of motion pausing for 3 seconds
+at each limit. This allows auto calibration to occur.
+
+Once you have completed auto calibration, press ENTER to exit.
+
+With the exception of firmware, multiple upload options can be specified. They will
+always complete in the order of "-p" profile upload, "-t" tjm upload and finally
+applying "-e/-m/-u" options.
 
 # Other Notes
 
@@ -225,7 +250,7 @@ It would be nice to not need to use Windows at all to do the pre-configuration
 but that cannot happen without further Linux utilities and additional feature
 support in this utility to cover:-
 
-  1. Firmware flashing                                     (planned)
+  1. Firmware flashing                                     (supported)
   2. Perform manual calibration
   3. Configure axis mappings and generate tmc file
   4. Upload pre-made tmc                                   (supported) 
