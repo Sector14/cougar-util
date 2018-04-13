@@ -118,7 +118,7 @@ void UploadTMJBinary(USBDevice &dev, const std::string& filename)
 void SetCougarOptions(USBDevice &dev, CougarOptions options)
 {
     static_assert(std::is_same<std::underlying_type<CougarOptions>::type, unsigned char>::value && "CougarOptions type mismatch");
-
+    
     // Whilst emulation is part of the 03 xx command bitmask, HOTAS CCP appears
     // to always send an extra 07 anytime emulation is not active. Not sure
     // why, but replicated anyway.
@@ -156,9 +156,6 @@ void UploadFirmware(USBDevice &dev, const std::string& filename)
 
     // New device has no profile loaded, flash a default one
     UploadProfileData(dev, cDefaultTCMProfile);
-
-    std::cout << "Resetting device\n";
-    WaitResetDevice(dev);
 }
 
 //////////////////////////////////////////////////////////////////////
