@@ -1,4 +1,4 @@
-# Cougar Util
+# Cougar Util - Version 0.9
 
 Provides support for using a pre-configured Cougar HOTAS in Linux.
 
@@ -185,6 +185,13 @@ and calibration mode will be automatic.
   ./cougar-util -p config/rdr-cursor-on.tmc
 ```
 
+Upload tmj binary and enable button/axis emulation. Axis profile will switch
+to default and calibration mode will be automatic.
+
+```bash
+  ./cougar-util -t config/dunc_dx_replacement.bin -e
+```
+
 Switch back to defaults, automatic calibration, default axis, button 
 emulation off. Previously uploaded profile and manual calibration data is
 retained and available for later activation.
@@ -256,7 +263,7 @@ support in this utility to cover:-
   4. Upload pre-made tmc                                   (supported) 
   5. Activate user/default tmc profile                     (supported)
   6. Compile tmj/tmm files
-  7. Upload compiled tmj/tmm                               (planned)
+  7. Upload compiled tmj/tmm                               (supported)
   8. Enable/disable Emulation mode                         (supported)
   9. Select manual or automatic calibration                (supported) 
 
@@ -281,19 +288,12 @@ merging manual calibration data which is unique to each cougar.
 a compiler for tmj/tmm files that saves in the same bin format as
 the HOTASCompiler produces (as a temporary file) please let me know.
 
-Uploading of compiled BIN files on the other hand is worthwhile to allow switching
-between different tmj game profiles without needing Windows/Wine/VM. See
-compiler section below for instructions on generating BIN files in Windows.
 
-"7" - This didn't seem possible due to the lack of an output file from the HOTASCompiler.
-However, there is a hacky workaround to get HOTASCompiler.exe in windows to 
-generate a .BIN file that is suitable for uploading to the Cougar. 
+# Remaining TODO items
 
-This makes it possible to bundle a few common compiled profiles such as Dunc's
-and Dunc's replacement for BMS. End users with access to windows (or a VM/wine)
-can also use foxy to edit/generate their own too.
-
-For this reason upload support for compiled TMJ files (BIN) will be added.
+  1. Verify shasum of extracted firmware
+  2. Determine version of firmware for display. This can be hard-coded alongside
+     fw hash and is only important if older fw support is needed.  
 
 
 # HOTASCompiler BIN Files
