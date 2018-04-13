@@ -33,8 +33,8 @@ covered in the "Thoughts on the Future" section.
 ## Building
 
 Requires:
-   - libusb-1.0 and libusb-1.0-dev.
-   - libcrypto++6 and libcrypto++-dev
+   * libusb-1.0 and libusb-1.0-dev.
+   * libcrypto++6 and libcrypto++-dev
 
 Run make in the root directory and copy the resulting cougar-util binary
 to a suitable location for example /usr/local/bin
@@ -114,9 +114,9 @@ Once you have completed auto calibration, press ENTER exit.
 
 #### Step 2
 
-After following the above instructions, there is one final step to fully setup the Cougar for Falcon BMS.
-You will want to upload your either own or the bundled TCM axis profile as well as optionally one of the
-compiled Dunc TMJ files (maps wheel brakes + autopilot override to the paddle).
+To fully setup the Cougar for Falcon BMS. You will want to upload your own (or the bundled)
+TCM axis profile as well as optionally one of the compiled Dunc TMJ files (maps wheel
+brakes + autopilot override to the paddle).
 
 ```bash
 root@icarus:# ./cougar-util -p config/rdr-cursor-on.tmc -t config/dunc_dx_replacement.bin -u -e
@@ -125,17 +125,12 @@ root@icarus:# ./cougar-util -p config/rdr-cursor-on.tmc -t config/dunc_dx_replac
 The above will upload both files and enable button emulation. Note, if you are using your own TCM
 file that you generated in Windows and did the manual calibration step before saving, you can add
 the -m switch to request the Cougar make use of the manual calibration data. Do not use "-m" when
-using the bundled TCM as it include my calibration data which is unlikely to be of any use to you.
+using the bundled TCM as it includes my calibration data which is unlikely to be of any use to you.
 
 The bundled rdr-cursor-on.tmc enables support for the RDR Cursor axis at the expense
 of the rudder toe brake axes (see Falcon BMS Cougar setup docs for more information).
-Upload only needs to be performed once. After that use the "-u" option above to activate
+Upload only needs to be performed once. After that use the "-u" option to activate
 the profile.
-
-NOTE: As tmc files include manual calibration data, unless you have stolen my
-joystick you should leave the device in auto calibration mode if using the bundled tmc
-files. In order to use manual calibration mode you should generate your own tmc file 
-in Windows.
 
 
 #### Step 3
@@ -182,14 +177,14 @@ hit the same max limit.
 
 You will need to perform a one-time manual calibration via HOTAS CCP in Windows.
 After which using "-m" will ensure the manual data is used. Note, it's
-recommended to leave all axis as linear, do not apply curves, Falcon BMS
+recommended to leave each axis as linear, do not apply curves, Falcon BMS
 will handle this for you.
 
 ```
   -p    Allows a specified tmc axis profile to be uploaded to the Cougar's flash.
 ```
 
-After configuring axes in HOTAS CCP and making curve/deadzone adjustments
+After configuring each axis in HOTAS CCP and making curve/deadzone adjustments
 plus performing a manually calibration, any TMC file you then save can be uploaded
 from Linux using the above option.
 
@@ -227,7 +222,8 @@ compile TMJ to BIN.
 Due to the copyright restrictions it is unclear whether distribution of the Cougar
 firmware is allowed. This utility can extract the firmware out of the HOTASUpdate.exe
 that is a part of the Cougar Windows driver installation. Please obtain a copy
-of HOTASUpdate.exe and specify its location e.g "-f config/HOTASUpdate.exe" option.
+of HOTASUpdate.exe and specify its location via the "-f" option 
+e.g "-f config/HOTASUpdate.exe".
 
 The correct HOTASUpdate.exe should match this sha256sum
 
@@ -324,7 +320,7 @@ placed in upon each connection.
 
 config/rdr-cursor-on.tmc - Moves the microstick x & y axis to 6/7 and moves
 rudder and toe brakes to 8/9/10. This allows the microstick to be used in Falcon
-BMS. It also enables the "Windows Axis" option allowing all 10 axis to be visible.
+BMS. It also enables the "Windows Axis" option allowing all 10 axes to be visible.
 
 config/rdr-cursor-off.tmc - Moves microstick x & y axis to 9/10 and rudder/toe
 brakes to 6/7/8. It also disables the "Windows Axis" option, only 7 axis will
@@ -380,10 +376,11 @@ the HOTASCompiler produces (as a temporary file) please let me know.
 
 ## HOTASCompiler BIN Files
 
-The workaround is that on Windows 7, HOTASCompiler.exe generates a BIN file in the
-Program Files(x86)/HOTAS/ directory with the name of the tmj you're compiling and
-the extension .BIN. Due to file access restrictions, the generated temporary file
-is actually created in the Local AppData VirtualStore HOTAS directory.
+Whilst the Windows TMJ compiler does not produce an output file, there is a workaround
+on Windows 7. HOTASCompiler.exe generates a BIN file in the Program Files(x86)/HOTAS/
+directory with the name of the tmj you're compiling and the extension .BIN. Due to file
+access restrictions, the generated temporary file is actually created in the Local
+AppData VirtualStore HOTAS directory.
 
 The snag is that HOTASCompiler deletes this file as soon as it's done. As a workaround
 you can remove the Delete permission on the HOTAS directory. Properties/Security tab/
@@ -392,7 +389,7 @@ column for "Delete sub-folders and files" and then Apply and ok out.
 
 You can now use Foxy to compile any TMJ/TMM file and find the corresponding bin
 file in the virtual store. Generate a bin file for each TMJ game profile you wish
-to use, transfer to Linux and then you can use the cougar-util (once supported) to
+to use, transfer to Linux and then you can use the cougar-util with the "-t" option to
 upload and switch between profiles.
 
 
