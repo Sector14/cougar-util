@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <type_traits>
 
-#include "crypto++/sha.h"
+#include <crypto++/sha.h>
 
 #include "cougardevice.h"
 #include "usbdevice.h"
