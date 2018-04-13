@@ -1,15 +1,11 @@
 # Cougar Util - Version 0.9
 
-Provides support for using a pre-configured Cougar HOTAS in Linux.
+Provides support for configuring a Cougar HOTAS in Linux.
 
-Pre-configured in this instance means, User axis mapping, manual calibration
-and uploading of a tmj/tmm file (if required) should have been performed
-in Windows using the HOTAS CCP and Foxy software.
-
-Upon plugging in the (pre-configured) Cougar, it will be in a default
-axis, no button emulation, automatic calibration mode, however user
-profile, tmj/tmm and manual calibration data from prior configuration
-(in Windows) is retained in the Cougar's flash. 
+Upon plugging in a pre-configured Cougar, it will be in a default
+axis, no button emulation, automatic calibration mode, however any user
+profile, tmj/tmm and manual calibration data you may have uploaded via windows
+or this utility is retained in the Cougar's flash.
 
 This utility allows setting the three configuration options within the Cougar
 to make use of the pre-configured data. Selection of default or user axis
@@ -21,28 +17,34 @@ HOTAS CCP application that runs during windows startup to configure the
 device. It does not recreate the full configuration abilities that HOTAS CCP
 or indeed Foxy provides.
 
-If you do not have access to Windows you can still mostly configure your
-HOTAS. A bundled tcm profile allows the RDR Cursor axis to be remapped
-for use in Falcon BMS, however due to embedded manual calibration data
-you will need to stick to using automatic calibration mode when using the
-bundled TCM.
+If your Cougar has previously been fully configured in Windows using HOTAS CCP
+skip to the Basic Usage section. If you do not have access to windows you
+can still configure your Cougar from Linux with this utility by making
+use of a few bundled config files. Refer to the "Fresh Setup" section.
 
-Handles only a single connected Cougar HOTAS. Connections will be made
-to the first detected device in the case of several matching vid:pid devices.
+This utility only supports a single connected Cougar HOTAS. Connections will
+be made to the first detected device in the case of several matching 
+vid:pid devices.
 
 Further support to reduce the reliance on access to a Windows machine is
 covered in the "Thoughts on the Future" section.
 
-# Usage
 
-Run the utility with -h for help.
+## Building
 
-Running ./cougar-util with no options will configure the Cougar to the same
-state it would be in if you disconnect and reconnect the device. Default axis
-profile, no emulation, automatic calibration.
+Requires:
+   - libusb-1.0 and libusb-1.0-dev.
+   - libcrypto++6 and libcrypto++-dev
 
-Assuming your Cougar has been one-time configured in Windows, most users
-will simply need to run this utility with the following switches:
+Run make in the root directory and copy the resulting cougar-util binary
+to a suitable location for example /usr/local/bin
+
+## Quickstart
+### Basic Usage
+
+Assuming your Cougar has been one-time configured in Windows and you just want
+to use it as is in Linux, most users will simply need to run this utility with
+the following switches:
 
 ```bash
   ./cougar-util -u -e -m
@@ -51,8 +53,95 @@ will simply need to run this utility with the following switches:
 Which will activate the existing user profile mapping, enable button and axis 
 emulation and enable your manual calibration data.
 
+Run the utility with -h for help.
+
+Running ./cougar-util with no options will configure the Cougar to the same
+state it would be in if you disconnect and reconnect the device. Default axis
+profile, no emulation, automatic calibration.
+
 NOTE: cougar-util will need to be run as root in order to access the usb device.
 Refer to the "Automatic Configuration" section for alternatives.
+
+
+### Fresh Setup
+
+This utility allows a nearly complete reconfiguration of the Cougar HOTAS with 
+the exception of generating manual calibration data. If you do not have access
+to Windows to perform manual calibration and save the resulting TCM file
+for usage with this utility, you will need to keep your cougar in automatic
+calibration mode.
+
+#### Step 1
+If your Cougar already has working firmware, this step may be skipped. 
+
+To flash firmware, first obtain "HOTASUpdate.exe". It ships with the Windows
+drivers and can be extracted via wine. This file is not bundled due to 
+copyright restrictions. Only version 3.00.6 revB of the firmware is supported
+for upload, to check you have the correct HOTASUpdate.exe file the sha256sum
+of the file should match:
+
+```
+d91314c4326eb49f2298d5bbf024fac8d8c694e057ab769dc1fda931cb7f3db5  config/HOTASUpdate.exe
+```
+
+The utility will refuse to upload the new firmware if the firmware hash does not match.
+
+```bash
+root@icarus:# ./cougar-util -f config/HOTASUpdate.exe 
+********************************************************************************
+*    WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING   *
+********************************************************************************
+
+Thrustmaster recommend you DISCONNECT your THROTTLE from the Cougar before uploading
+new firmware. Users have reported permanent damage to the throttle if left connected.
+Firmware update is at your own risk.
+
+Before proceeding, unplug your Cougar (and disconnect your throttle) then whilst
+holding down the trigger, plug your Cougar back in. Keep the trigger held down for
+at least four seconds after connection to wipe any existing firmware. Then release
+the trigger and wait a few more seconds for Linux to re-detect the device.
+
+Proceed with firmware (3.00.6 revB) upload version ? (y/n): y
+Uploading firmware. This may take several seconds to complete...
+
+Firmware upload complete. Please disconnect your Cougar, re-attach the throttle and
+reconnect. Wait a few seconds for device detection then move each axis through its
+full range of motion, holding at each limit for 3 seconds to allow auto calibration
+to work.
+
+Once you have completed auto calibration, press ENTER exit.
+```
+
+#### Step 2
+
+After following the above instructions, there is one final step to fully setup the Cougar for Falcon BMS.
+You will want to upload your either own or the bundled TCM axis profile as well as optionally one of the
+compiled Dunc TMJ files (maps wheel brakes + autopilot override to the paddle).
+
+```bash
+root@icarus:# ./cougar-util -p config/rdr-cursor-on.tmc -t config/dunc_dx_replacement.bin -u -e
+```
+
+The above will upload both files and enable button emulation. Note, if you are using your own TCM
+file that you generated in Windows and did the manual calibration step before saving, you can add
+the -m switch to request the Cougar make use of the manual calibration data. Do not use "-m" when
+using the bundled TCM as it include my calibration data which is unlikely to be of any use to you.
+
+The bundled rdr-cursor-on.tmc enables support for the RDR Cursor axis at the expense
+of the rudder toe brake axes (see Falcon BMS Cougar setup docs for more information).
+Upload only needs to be performed once. After that use the "-u" option above to activate
+the profile.
+
+NOTE: As tmc files include manual calibration data, unless you have stolen my
+joystick you should leave the device in auto calibration mode if using the bundled tmc
+files. In order to use manual calibration mode you should generate your own tmc file 
+in Windows.
+
+
+#### Step 3
+
+To avoid having to re-run the utility each time you connect your Cougar, please refer to 
+the Automatic Configuration section.
 
 
 ## Options
@@ -111,6 +200,26 @@ NOTE: Uploaded TMC files include manual calibration data. You should only
 use/upload TMC files you have generated yourself via HOTAS CCP if you intend
 to enable manual calibration mode.
 
+Uploaded TCM files are retained in the Cougar's flash between connections. You
+only need to upload a profile once. After that use "-u" to activate the existing
+profile.
+
+```
+  -t    Upload a binary TMJ file.
+```
+
+TMJ files must be compiled via Foxy on Windows. Only the resulting .BIN file
+may be uploaded by this utility.
+
+As with TCM files, you only need to upload the TMJ file once, although you
+may wish to upload a different game specific TMJ BIN file if you use different
+TMJ mappings with different games.
+
+You will need to enable button/axis emulation via the "-e" switch to use the profile.
+
+Refer to the "HOTASCompiler BIN Files" section for instructions on how to
+compile TMJ to BIN.
+
 ```
   -f    Upload the specified firmware file to the Cougar
 ```
@@ -133,30 +242,12 @@ at each limit. This allows auto calibration to occur.
 
 Once you have completed auto calibration, press ENTER to exit.
 
-With the exception of firmware, multiple upload options can be specified. They will
-always complete in the order of "-p" profile upload, "-t" tjm upload and finally
+With the exception of firmware, multiple upload options can be specified at once.
+They will always complete in the order of "-p" profile upload, "-t" tjm upload and finally
 applying "-e/-m/-u" options.
 
-# Other Notes
 
-Access to Windows to perform manual calibration or to compile and upload/switch
-tmj/tmm files is required.
-
-Users with a working Cougar joystick that has no user axis profile uploaded
-and have no access to Windows can upload the bundled config\falcon-rdr-cursor-on.tmc
-(or off) profile via the -p switch.
-
-This enables support for the RDR Cursor axis at the expense of the rudder toe brake
-axes (see Falcon BMS Cougar setup docs for more information). Upload only needs to
-be performed once. After that use the "-p" option above.
-
-NOTE: As tmc files include manual calibration data, unless you have stolen my
-joystick you should leave the device in auto calibration mode if using the above tmc
-files. In order to use manual calibration mode you should generate your
-own tmc file in Windows.
-
-
-# Usage Examples
+## Usage Examples
 
 Activate user axis profile (for RDR Cursor), button emulation mode for
 use by currently uploaded tmj/tmm profile and manual calibration data.
@@ -192,6 +283,12 @@ to default and calibration mode will be automatic.
   ./cougar-util -t config/dunc_dx_replacement.bin -e
 ```
 
+Flash new firmware
+
+```bash
+  ./cougar-util -f config/HOTASUpdate.exe
+```
+
 Switch back to defaults, automatic calibration, default axis, button 
 emulation off. Previously uploaded profile and manual calibration data is
 retained and available for later activation.
@@ -200,17 +297,7 @@ retained and available for later activation.
   ./cougar-util
 ```
 
-# Building
-
-Requires:
-   - libusb-1.0 and libusb-1.0-dev.
-   - libcrypto++6 and libcrypto++-dev
-
-Run make in the root directory and copy the resulting cougar-util binary
-to a suitable location for example /usr/local/bin
-
-
-# Automatic Configuration
+## Automatic Configuration
 
 In most cases, upon connection of the Cougar you'll want to automatically
 apply the user profile, manual calibration and emulation mode (or variation of)
@@ -233,7 +320,7 @@ Modify the 99-HOTAS.rules file if you wish to change the mode the Cougar will be
 placed in upon each connection.
 
 
-# Bundled Configs
+## Bundled Configs
 
 config/rdr-cursor-on.tmc - Moves the microstick x & y axis to 6/7 and moves
 rudder and toe brakes to 8/9/10. This allows the microstick to be used in Falcon
@@ -253,7 +340,7 @@ files that shipped with Falcon BMS 4.33-U5. Refer to the "HOTASCompiler BIN File
 section if you wish to use different TMJ files from Linux.
 
 
-# Thoughts on the Future
+## Thoughts on the Future
 
 It would be nice to not need to use Windows at all to do the pre-configuration
 but that cannot happen without further Linux utilities and additional feature
@@ -291,14 +378,7 @@ a compiler for tmj/tmm files that saves in the same bin format as
 the HOTASCompiler produces (as a temporary file) please let me know.
 
 
-# Remaining TODO items
-
-  1. Verify shasum of extracted firmware
-  2. Determine version of firmware for display. This can be hard-coded alongside
-     fw hash and is only important if older fw support is needed.  
-
-
-# HOTASCompiler BIN Files
+## HOTASCompiler BIN Files
 
 The workaround is that on Windows 7, HOTASCompiler.exe generates a BIN file in the
 Program Files(x86)/HOTAS/ directory with the name of the tmj you're compiling and
@@ -316,13 +396,14 @@ to use, transfer to Linux and then you can use the cougar-util (once supported) 
 upload and switch between profiles.
 
 
-# WARNING / DISCLAIMER
+## WARNING / DISCLAIMER
 
 I have not properly reverse engineered the Cougar USB protocol and whilst I use
 this application myself without issue, I take no responsibility nor provide any
 guarantee that this utility will not cause any damage. Use at your own risk.
 
-# Contact
+
+## Contact
 
 Please let me know if you encounter any bugs and as always monetary support is
 appreciated. Donations can be made via https://www.paypal.me/GPreston42

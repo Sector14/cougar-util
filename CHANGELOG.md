@@ -14,6 +14,7 @@ This project uses [Semantic Versioning](https://semver.org/).
    - Add "-f" option to extract firmware from HOTASUpdate.exe and flash Cougar.   
    - Add "-t" option to upload pre-compiled TMJ binaries.
    - libcrypto++6 build dependency
+   - Firmware hash verified before upload
    
 ### Fixed
    - dunc_dx_replacement.bin incorrectly used dunc_dx.tmm file.

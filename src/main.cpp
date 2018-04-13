@@ -34,12 +34,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using CougarOptions = CougarDevice::CougarOptions;
 
+const std::string cAppVersion = "0.1.0";
+
 //////////////////////////////////////////////////////////////////////
 // Main/Usage
 //////////////////////////////////////////////////////////////////////
 
 static void PrintUsage(const char* appName)
 {
+    std::cout << "Cougar Utility version " << cAppVersion << "\n";
     std::cout << "Usage: " << appName << " [-u|-e|-m] [-p FILE]\n";
     std::cout << "Options:\n";
     std::cout << "  -u \tActivate user axis profile\n";
@@ -48,6 +51,7 @@ static void PrintUsage(const char* appName)
     std::cout << "  -p FILE\tUpload a tmc user profile (implies -u)\n";
     std::cout << "  -t FILE\tUpload a compiled tjm binary\n";
     std::cout << "  -f FILE\tUpload new firmware to Cougar\n";
+    std::cout << "  -v \tPrint version information";
     std::cout << "Defaults: default axis profile, no emulation, auto calibration.\n";
 }
 
@@ -118,7 +122,7 @@ int main( int argc, char *argv[])
                          "down the trigger, plug your Cougar back in. Keep the trigger held down for "
                          "at least four seconds after connection to wipe any existing firmware. Then release the trigger "
                          "and wait a few more seconds for Linux to re-detect the device.\n\n";
-            std::cout << "Proceed with firmware upload? (y/n): ";
+            std::cout << "Proceed with firmware (" << CougarDevice::cSupportedFirmwareVersion << ") upload version ? (y/n): ";
 
             std::string temp;
             std::getline(std::cin, temp);
