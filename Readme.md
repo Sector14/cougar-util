@@ -250,7 +250,7 @@ It would be nice to not need to use Windows at all to do the pre-configuration
 but that cannot happen without further Linux utilities and additional feature
 support in this utility to cover:-
 
-  1. Firmware flashing                                     (planned)
+  1. Firmware flashing                                     (supported)
   2. Perform manual calibration
   3. Configure axis mappings and generate tmc file
   4. Upload pre-made tmc                                   (supported) 
