@@ -30,16 +30,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace CougarDevice {
 
 static const size_t cTMCFileSizeBytes = 171;
+static const size_t cTMJBINFileSizeBytes = 1425;
+static const size_t cHOTASUpdateFirmwareSizeBytes = 25030;
 
-// Profile data returned by 04 01
-static const int cProfileDataWindowsAxisIDX = 168;
+static std::vector<unsigned char> cTCMBINFileMagic = {0x02, 0xff};
 
-// TODO: HOTASUpdate.exe sha256sum for safety check
-
-static const size_t cHOTASUpdateFirmwareSize = 25030;
 static const std::vector<unsigned char> cDefaultTCMProfile = {
     0x02,0x00,0x01,0x08,0x09,0x02,0x03,0x04,0x05,0x06,0x07,0x00,0x00,0x9e,0x38,0x90,0x46,0x90,0x80,0x77,0x80,0x81,0x10,0x88,0x00,0x88,0x80,0x00,0x00,0x00,0x00,0x00,0x00,0x17,0x9d,0x10,0x19,0x14,0x78,0x15,0x8e,0x25,0x76,0x31,0x74,0x29,0x26,0x24,0xbe,0x16,0xca,0x16,0xcb,0x19,0xca,0x10,0x3e,0x19,0xf2,0x10,0x2e,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x06,0x00,0x08,0x00,0x08,0x00,0x10,0xcc,0x10,0xcc,0x00,0x00,0x08,0x00,0x08,0x00,0x08,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xef,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x03,0xff,0xff,0xff,0xff,0xff,0xff,0x00
 };
+
+// Profile data returned by 04 01
+static const int cProfileDataWindowsAxisIDX = 168;
+static const int cProfileDataOptionsIDX = 0;
+
+// TODO: HOTASUpdate.exe sha256sum for safety check
 
 //////////////////////////////////////////////////////////////////////
 // File I/O
@@ -112,7 +116,29 @@ void UploadProfile(USBDevice &dev, const std::string& filename)
 
 void UploadTMJBinary(USBDevice &dev, const std::string& filename)
 {
-    std::cout << "Not implemented yet\n";
+    // Read current profile data to determine if the "Windows Axis" state has changed
+    dev.WriteBulkEP({4,1}, cCougarEndpointBulkOut);
+    auto oldData = dev.ReadBulkEP(256, cCougarEndpointBulkIn);
+    
+    // Cache users current options and reset to defaults
+    CougarOptions oldOptions = static_cast<CougarOptions>(oldData.at(cProfileDataOptionsIDX));
+    SetCougarOptions(dev, CougarOptions::Defaults);
+
+    auto newData = LoadBinaryFile(filename);
+    
+    // File size is variable for TJM BIN. Using "02 ff" magic for sanity instead.
+    // How stable this is as a magic remains to be seen.
+    if ( newData.size() < cTCMBINFileMagic.size() || 
+         ! std::equal(newData.end() - cTCMBINFileMagic.size(), newData.end(), cTCMBINFileMagic.begin()))
+        throw std::runtime_error("Loaded binary file does not appear to be a compiled tjm. Expected file ending in 02ff0a");
+
+    // Upload to Cougar. Unlike tcm, cmd is not present in the file and needs sending as first byte of
+    // TJM data. This cannot be sent as a command on its own.
+    newData.insert(newData.begin(), 1);
+    dev.WriteBulkEP(newData, cCougarEndpointBulkOut);
+
+    // Restore options
+    SetCougarOptions(dev, oldOptions);
 }
 
 void SetCougarOptions(USBDevice &dev, CougarOptions options)
@@ -136,18 +162,20 @@ void UploadFirmware(USBDevice &dev, const std::string& filename)
     std::ifstream file(filename, std::ios::binary);
     if (! file.is_open())
         throw std::runtime_error("Unable to open file " + filename);
-    file.seekg(-cHOTASUpdateFirmwareSize, file.end);
+    file.seekg( -cHOTASUpdateFirmwareSizeBytes, file.end );
     
     // "0x05" firmware update command followed by firmware itself and "0xff"
     std::vector<unsigned char> firmware{5};
-    firmware.reserve(cHOTASUpdateFirmwareSize+2);
-    firmware.resize(cHOTASUpdateFirmwareSize+1);
-    file.read(reinterpret_cast<char *>(firmware.data()+1), cHOTASUpdateFirmwareSize);
+    firmware.reserve(cHOTASUpdateFirmwareSizeBytes+2);
+    firmware.resize(cHOTASUpdateFirmwareSizeBytes+1);
+    file.read(reinterpret_cast<char *>(firmware.data()+1), cHOTASUpdateFirmwareSizeBytes);
     firmware.emplace_back(0xff);
 
     if (! file.good())
         throw std::runtime_error("Unable to extract firmware data from " + filename);
 
+    // TODO: Verify sha256 of extracted firmware
+    
     dev.WriteBulkEP(firmware, cCougarEndpointBulkOut);
 
     // Firmware upload causes a device reset
