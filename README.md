@@ -202,7 +202,9 @@ retained and available for later activation.
 
 # Building
 
-Requires libusb-1.0 and libusb-1.0-dev.
+Requires:
+   - libusb-1.0 and libusb-1.0-dev.
+   - libcrypto++6 and libcrypto++-dev
 
 Run make in the root directory and copy the resulting cougar-util binary
 to a suitable location for example /usr/local/bin

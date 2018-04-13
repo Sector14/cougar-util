@@ -11,15 +11,17 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 ### Added
-   - Add "-f" option to extract firmware from HOTASUpdate.exe and flash Cougar.
+   - Add "-f" option to extract firmware from HOTASUpdate.exe and flash Cougar.   
    - Add "-t" option to upload pre-compiled TMJ binaries.
-
+   - libcrypto++6 build dependency
+   
 ### Fixed
    - dunc_dx_replacement.bin incorrectly used dunc_dx.tmm file.
 
 ### Changed
+   - UDev rules updated to prevent auto configuration if cougar-util running.
    - README changed to include new usage notes.
-
+   - Build now requires openssl
 
 ## [0.1.0] - 2018-04-12
 ### Added
