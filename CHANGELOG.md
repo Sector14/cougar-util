@@ -9,7 +9,7 @@ found in the [project git repository](https://bitbucket.org/BWGaryP/cougar-util)
 
 This project uses [Semantic Versioning](https://semver.org/).
 
-## [Unrelease]
+## [Unreleased]
    - ...
    
 ## [0.2.0] - 2018-04-13
@@ -25,7 +25,6 @@ This project uses [Semantic Versioning](https://semver.org/).
 ### Changed
    - UDev rules updated to prevent auto configuration if cougar-util running.
    - README changed to include new usage notes.
-   - Build now requires openssl
 
 ## [0.1.0] - 2018-04-12
 ### Added
