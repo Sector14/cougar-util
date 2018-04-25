@@ -11,7 +11,11 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
    - ...
-   
+
+## [0.2.1] - 2018-04-25
+### Changed
+   - Change udev rule RUN to use wrapper script
+
 ## [0.2.0] - 2018-04-13
 ### Added
    - Add "-f" option to extract firmware from HOTASUpdate.exe and flash Cougar.   
