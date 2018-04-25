@@ -9,9 +9,13 @@ found in the [project git repository](https://bitbucket.org/BWGaryP/cougar-util)
 
 This project uses [Semantic Versioning](https://semver.org/).
 
-## [Unrelease]
+## [Unreleased]
    - ...
-   
+
+## [0.2.1] - 2018-04-25
+### Changed
+   - Change udev rule RUN to use wrapper script
+
 ## [0.2.0] - 2018-04-13
 ### Added
    - Add "-f" option to extract firmware from HOTASUpdate.exe and flash Cougar.   
@@ -25,7 +29,6 @@ This project uses [Semantic Versioning](https://semver.org/).
 ### Changed
    - UDev rules updated to prevent auto configuration if cougar-util running.
    - README changed to include new usage notes.
-   - Build now requires openssl
 
 ## [0.1.0] - 2018-04-12
 ### Added

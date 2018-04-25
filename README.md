@@ -304,7 +304,8 @@ config/99-HOTAS.rules. To use, execute the following commands as root. If you
 use a different path for cougar-util, ensure you update the udev rule accordingly.
 
 ```bash
-   cp cougar-util /usr/local/bin
+   cp cougar-util /usr/local/bin/
+   cp cougar-wrapper.sh /usr/local/bin/
    cp config/99-HOTAS.rules /etc/udev/rules.d/
    udevadm trigger
 ```
@@ -312,7 +313,7 @@ use a different path for cougar-util, ensure you update the udev rule accordingl
 Anytime you connect your Cougar it should now automatically be placed in user profile 
 mode with manual calibration mode and axis/button emulation enabled.
 
-Modify the 99-HOTAS.rules file if you wish to change the mode the Cougar will be 
+Modify the cougar-wrapper.sh file if you wish to change the mode the Cougar will be 
 placed in upon each connection.
 
 
